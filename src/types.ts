@@ -5,6 +5,12 @@ export type Position = {
 
 export type EntityType = 'player' | 'enemy' | 'item' | 'exit';
 
+export type InventoryItem = {
+  id: string;
+  name: string;
+  quantity: number;
+};
+
 export type Entity = {
   id: string;
   type: EntityType;
@@ -37,4 +43,5 @@ export type GameState = {
   gameStatus: 'playing' | 'won' | 'lost';
   message: string;
   dungeonLevel: number;
+  inventory: InventoryItem[];
 };

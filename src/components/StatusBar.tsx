@@ -1,5 +1,7 @@
 import React from 'react';
 import { Entity } from '../types';
+import { MAX_LEVEL } from '../utils/gameLogic';
+import { Heart, Swords } from 'lucide-react';
 
 interface StatusBarProps {
   player: Entity;
@@ -11,30 +13,38 @@ const StatusBar: React.FC<StatusBarProps> = ({ player, message, dungeonLevel }) 
   const healthPercentage = player.health ? (player.health / 100) * 100 : 0;
   
   return (
-    <div className="bg-gray-800 p-4 text-white">
-      <div className="flex justify-between items-center mb-2">
-        <div>
-          <span className="font-bold">Health: </span>
-          <div className="w-48 h-4 bg-gray-700 rounded-full overflow-hidden inline-block ml-2">
+    <div className="p-4 space-y-2">
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <Heart className="w-5 h-5 text-red-500" />
+          <div className="w-32 h-4 bg-gray-700 rounded-full overflow-hidden">
             <div 
-              className="h-full bg-red-600" 
+              className="h-full bg-red-500 transition-all duration-300"
               style={{ width: `${healthPercentage}%` }}
-            ></div>
+            />
           </div>
-          <span className="ml-2">{player.health}/100</span>
+          <span className="text-sm">{player.health}/100</span>
         </div>
-        <div>
-          <span className="font-bold">&nbsp;Damage: </span>
-          <span>{player.damage}</span>
+        
+        <div className="flex items-center gap-2">
+          <Swords className="w-5 h-5 text-blue-400" />
+          <span className="text-sm">DMG: {player.damage}</span>
         </div>
-        <div>
-          <span className="font-bold">&nbsp;Level: </span>
-          <span>{dungeonLevel}</span>
+        
+        <div className="flex items-center gap-2 ml-auto">
+          <span className="text-sm text-yellow-500">
+            Level: {dungeonLevel}/{MAX_LEVEL}
+          </span>
+          <div className="w-24 h-2 bg-gray-700 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-yellow-500 transition-all duration-300"
+              style={{ width: `${(dungeonLevel / MAX_LEVEL) * 100}%` }}
+            />
+          </div>
         </div>
       </div>
-      <div className="bg-gray-700 p-2 rounded">
-        {message}
-      </div>
+      
+      <div className="text-gray-300 text-sm">{message}</div>
     </div>
   );
 };

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import GameMap from './components/GameMap';
 import StatusBar from './components/StatusBar';
 import Controls from './components/Controls';
+import Inventory from './components/Inventory';
 import { initGame, movePlayer } from './utils/gameLogic';
 import { GameState } from './types';
 
@@ -49,7 +50,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-4">
-      <h1 className="text-3xl font-bold mb-4">Dungeon Crawler</h1>
+      <h1 className="text-3xl font-bold mb-4">Escape the Cat Dungeon</h1>
       
       {gameState.gameStatus === 'won' && (
         <div className="bg-green-800 p-4 mb-4 rounded text-center">
@@ -72,10 +73,16 @@ function App() {
           dungeonLevel={gameState.dungeonLevel}
         />
         
-        <GameMap 
-          level={gameState.level} 
-          playerPosition={gameState.player.position}
-        />
+        <div className="flex gap-4">
+          <GameMap 
+            level={gameState.level} 
+            playerPosition={gameState.player.position}
+          />
+          
+          <div className="w-64">
+            <Inventory items={gameState.inventory} />
+          </div>
+        </div>
         
         <Controls 
           onMove={handleMove}

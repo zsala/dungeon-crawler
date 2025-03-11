@@ -1,5 +1,7 @@
-import { GameState, Position, Entity } from '../types';
+import { GameState, Position, Entity, InventoryItem } from '../types';
 import { generateDungeon, calculateFOV } from './dungeonGenerator';
+
+export const MAX_LEVEL = 10;
 
 // Initialize a new game
 export const initGame = (): GameState => {
@@ -34,7 +36,8 @@ export const initGame = (): GameState => {
     player: actualPlayer,
     gameStatus: 'playing',
     message: 'Welcome to the dungeon! Use arrow keys to move.',
-    dungeonLevel
+    dungeonLevel,
+    inventory: []
   };
 };
 
@@ -148,6 +151,23 @@ const handleItemPickup = (state: GameState, player: Entity, item: Entity): GameS
   const updatedPlayer = { ...player };
   let message = `You picked up a ${item.name}.`;
   
+  // Update inventory
+  const existingItem = state.inventory.find(i => i.name === item.name);
+  let updatedInventory: InventoryItem[];
+  
+  if (existingItem) {
+    updatedInventory = state.inventory.map(i => 
+      i.name === item.name 
+        ? { ...i, quantity: i.quantity + 1 }
+        : i
+    );
+  } else {
+    updatedInventory = [
+      ...state.inventory,
+      { id: item.id, name: item.name, quantity: 1 }
+    ];
+  }
+  
   // Apply item effects
   switch (item.name) {
     case 'Health Potion':
@@ -174,6 +194,7 @@ const handleItemPickup = (state: GameState, player: Entity, item: Entity): GameS
     ...state,
     level: updatedLevel,
     player: updatedPlayer,
+    inventory: updatedInventory,
     message
   };
 };
@@ -181,6 +202,16 @@ const handleItemPickup = (state: GameState, player: Entity, item: Entity): GameS
 // Handle exit
 const handleExit = (state: GameState): GameState => {
   const newDungeonLevel = state.dungeonLevel + 1;
+  
+  // Check if player has completed all levels
+  if (newDungeonLevel > MAX_LEVEL) {
+    return {
+      ...state,
+      gameStatus: 'won',
+      message: 'Congratulations! You have completed all levels of the dungeon!'
+    };
+  }
+  
   const newLevel = generateDungeon(50, 30, newDungeonLevel);
   
   // Create a new player with the same stats but at the new position
@@ -212,8 +243,9 @@ const handleExit = (state: GameState): GameState => {
     level: updatedLevel,
     player: updatedPlayer,
     gameStatus: 'playing',
-    message: `You descended to dungeon level ${newDungeonLevel}!`,
-    dungeonLevel: newDungeonLevel
+    message: `You descended to dungeon level ${newDungeonLevel} of ${MAX_LEVEL}!`,
+    dungeonLevel: newDungeonLevel,
+    inventory: state.inventory
   };
 };
 
@@ -245,7 +277,7 @@ export const movePlayer = (state: GameState, direction: 'up' | 'down' | 'left' |
   if (!isWalkable(state, newPos)) {
     return {
       ...state,
-      message: 'You cannot move there.'
+      message: 'You are idle.'
     };
   }
   
@@ -257,7 +289,7 @@ export const movePlayer = (state: GameState, direction: 'up' | 'down' | 'left' |
   
   // Handle door opening
   const targetTile = updatedLevel.tiles[newPos.y][newPos.x];
-  let message = 'You move.';
+  let message = 'You are moving.';
   
   if (targetTile.type === 'door' && !targetTile.isDoorOpen) {
     targetTile.isDoorOpen = true;

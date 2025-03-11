@@ -179,7 +179,7 @@ export const generateDungeon = (width: number, height: number, dungeonLevel: num
     const enemyX = room.x + randomInt(1, room.width - 2);
     const enemyY = room.y + randomInt(1, room.height - 2);
     
-    const enemyTypes = ['Goblin', 'Skeleton', 'Orc', 'Troll'];
+    const enemyTypes = ['Cat'];
     const enemyType = enemyTypes[randomInt(0, enemyTypes.length - 1)];
     const enemyHealth = randomInt(20, 40) + dungeonLevel * 5;
     const enemyDamage = randomInt(5, 10) + dungeonLevel;
