@@ -3,15 +3,23 @@ import GameMap from './components/GameMap';
 import StatusBar from './components/StatusBar';
 import Controls from './components/Controls';
 import Inventory from './components/Inventory';
+import Minimap from './components/Minimap';
 import { initGame, movePlayer } from './utils/gameLogic';
 import { GameState } from './types';
 
 function App() {
   const [gameState, setGameState] = useState<GameState>(initGame());
+  const [showMinimap, setShowMinimap] = useState(true);
 
   // Handle keyboard input
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Handle minimap toggle
+      if (e.key.toLowerCase() === 'm') {
+        setShowMinimap(prev => !prev);
+        return;
+      }
+
       if (gameState.gameStatus !== 'playing') return;
       
       switch (e.key.toLowerCase()) {
@@ -46,11 +54,12 @@ function App() {
   // Restart the game
   const handleRestart = () => {
     setGameState(initGame());
+    setShowMinimap(true);
   };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-4">
-      <h1 className="text-3xl font-bold mb-4">Escape the Cat Dungeon</h1>
+      <h1 className="text-3xl font-bold mb-4">Dungeon Crawler</h1>
       
       {gameState.gameStatus === 'won' && (
         <div className="bg-green-800 p-4 mb-4 rounded text-center">
@@ -66,28 +75,36 @@ function App() {
         </div>
       )}
       
-      <div className="bg-gray-800 p-2 rounded-lg shadow-lg">
-        <StatusBar 
-          player={gameState.player} 
-          message={gameState.message}
-          dungeonLevel={gameState.dungeonLevel}
-        />
-        
-        <div className="flex gap-4">
-          <GameMap 
-            level={gameState.level} 
-            playerPosition={gameState.player.position}
+      <div className="flex gap-8 items-start">
+        <div className="bg-gray-800 p-2 rounded-lg shadow-lg">
+          <StatusBar 
+            player={gameState.player} 
+            message={gameState.message}
+            dungeonLevel={gameState.dungeonLevel}
           />
           
-          <div className="w-64">
-            <Inventory items={gameState.inventory} />
+          <div className="flex gap-4">
+            <GameMap 
+              level={gameState.level} 
+              playerPosition={gameState.player.position}
+            />
+            
+            <div className="w-64">
+              <Inventory items={gameState.inventory} />
+            </div>
           </div>
+          
+          <Controls 
+            onMove={handleMove}
+            gameStatus={gameState.gameStatus}
+            onRestart={handleRestart}
+          />
         </div>
-        
-        <Controls 
-          onMove={handleMove}
-          gameStatus={gameState.gameStatus}
-          onRestart={handleRestart}
+
+        <Minimap
+          level={gameState.level}
+          playerPosition={gameState.player.position}
+          isVisible={showMinimap}
         />
       </div>
       
